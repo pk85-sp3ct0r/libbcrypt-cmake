@@ -28,5 +28,5 @@ target_sources(crypt_blowfish INTERFACE
         )
 target_include_directories(crypt_blowfish INTERFACE ${crypt_blowfish_SOURCE_DIR})
 
-add_library(libbcrypt bcrypt.c)
+add_library(libbcrypt bcrypt.c bcrypt.h)
 target_link_libraries(libbcrypt crypt_blowfish)
