@@ -12,8 +12,8 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+//#include <sys/types.h>
+//#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -36,17 +36,17 @@ static int try_close(int fd)
 	return ret;
 }
 
-static int try_read(int fd, char *out, size_t count)
+static int try_read(int fd, char *out)
 {
 	size_t total;
 	ssize_t partial;
 
 	total = 0;
-	while (total < count)
+	while (total < 16)
 	{
 		for (;;) {
 			errno = 0;
-			partial = read(fd, out + total, count - total);
+			partial = read(fd, out + total, 16 - total);
 			if (partial == -1 && errno == EINTR)
 				continue;
 			break;
@@ -75,8 +75,8 @@ static int timing_safe_strcmp(const char *str1, const char *str2)
 	int ret;
 	int i;
 
-	int len1 = strlen(str1);
-	int len2 = strlen(str2);
+	int len1 = (int) strlen(str1);
+	int len2 = (int) strlen(str2);
 
 	/* In our context both strings should always have the same length
 	 * because they will be hashed passwords. */
@@ -105,7 +105,7 @@ int bcrypt_gensalt(int factor, char salt[BCRYPT_HASHSIZE])
 	if (fd == -1)
 		return 1;
 
-	if (try_read(fd, input, RANDBYTES) != 0) {
+	if (try_read(fd, input) != 0) {
 		if (try_close(fd) != 0)
 			return 4;
 		return 2;
@@ -139,57 +139,3 @@ int bcrypt_checkpw(const char *passwd, const char hash[BCRYPT_HASHSIZE])
 
 	return timing_safe_strcmp(hash, outhash);
 }
-
-#ifdef TEST_BCRYPT
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-
-int main(void)
-{
-	clock_t before;
-	clock_t after;
-	char salt[BCRYPT_HASHSIZE];
-	char hash[BCRYPT_HASHSIZE];
-	int ret;
-
-	const char pass[] = "hi,mom";
-	const char hash1[] = "$2a$10$VEVmGHy4F4XQMJ3eOZJAUeb.MedU0W10pTPCuf53eHdKJPiSE8sMK";
-	const char hash2[] = "$2a$10$3F0BVk5t8/aoS.3ddaB3l.fxg5qvafQ9NybxcpXLzMeAt.nVWn.NO";
-
-	ret = bcrypt_gensalt(12, salt);
-	assert(ret == 0);
-	printf("Generated salt: %s\n", salt);
-	before = clock();
-	ret = bcrypt_hashpw("testtesttest", salt, hash);
-	assert(ret == 0);
-	after = clock();
-	printf("Hashed password: %s\n", hash);
-	printf("Time taken: %f seconds\n",
-	       (double)(after - before) / CLOCKS_PER_SEC);
-
-	ret = bcrypt_hashpw(pass, hash1, hash);
-	assert(ret == 0);
-	printf("First hash check: %s\n", (strcmp(hash1, hash) == 0)?"OK":"FAIL");
-	ret = bcrypt_hashpw(pass, hash2, hash);
-	assert(ret == 0);
-	printf("Second hash check: %s\n", (strcmp(hash2, hash) == 0)?"OK":"FAIL");
-
-	before = clock();
-	ret = (bcrypt_checkpw(pass, hash1) == 0);
-	after = clock();
-	printf("First hash check with bcrypt_checkpw: %s\n", ret?"OK":"FAIL");
-	printf("Time taken: %f seconds\n",
-	       (double)(after - before) / CLOCKS_PER_SEC);
-
-	before = clock();
-	ret = (bcrypt_checkpw(pass, hash2) == 0);
-	after = clock();
-	printf("Second hash check with bcrypt_checkpw: %s\n", ret?"OK":"FAIL");
-	printf("Time taken: %f seconds\n",
-	       (double)(after - before) / CLOCKS_PER_SEC);
-
-	return 0;
-}
-#endif

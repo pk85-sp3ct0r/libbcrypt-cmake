@@ -31,3 +31,9 @@ target_include_directories(crypt_blowfish INTERFACE ${crypt_blowfish_SOURCE_DIR}
 add_library(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/bcrypt.c ${CMAKE_CURRENT_LIST_DIR}/bcrypt.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE crypt_blowfish)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
+# Tests ===========================================================================
+enable_testing()
+add_executable(${PROJECT_NAME}_test ${CMAKE_CURRENT_LIST_DIR}/bcrypt_test.c)
+target_link_libraries(${PROJECT_NAME}_test PRIVATE ${PROJECT_NAME})
+add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
