@@ -30,3 +30,4 @@ target_include_directories(crypt_blowfish INTERFACE ${crypt_blowfish_SOURCE_DIR}
 
 add_library(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/bcrypt.c ${CMAKE_CURRENT_LIST_DIR}/bcrypt.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE crypt_blowfish)
+target_link_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
