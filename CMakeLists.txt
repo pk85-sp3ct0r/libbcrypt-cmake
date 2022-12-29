@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 # Project settings ================================================================
-project("libbcrypt"
+project(libbcrypt
         LANGUAGES C
         HOMEPAGE_URL "https://github.com/pk85-sp3ct0r/libbcrypt-cmake.git"
         )
@@ -30,4 +30,4 @@ target_include_directories(crypt_blowfish INTERFACE ${crypt_blowfish_SOURCE_DIR}
 
 add_library(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/bcrypt.c ${CMAKE_CURRENT_LIST_DIR}/bcrypt.h)
 target_link_libraries(${PROJECT_NAME} PRIVATE crypt_blowfish)
-target_link_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
