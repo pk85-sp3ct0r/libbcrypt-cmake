@@ -10,7 +10,7 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_EXTENSIONS ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# Fetch Mongooses Repository ======================================================
+# Fetch Crypt Blowfish Repository ==================================================
 include(FetchContent)
 FetchContent_Declare(
         crypt_blowfish
